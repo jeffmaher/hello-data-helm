@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-data-deploy
+  labels:
+    app: hello-data
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello-data
+  template:
+    metadata:
+      labels:
+        app: hello-data
+    spec:
+      containers:
+        - name: hello-data-pod
+          image: jeffmaher/hello-data:{{ .Values.hello_data.version }}
+          ports:
+            - containerPort: {{ .Values.hello_data.port }}
+      livenessProbe:
+        initialDelaySeconds: 10
+        periodSeconds: 60
+        timeoutSeconds: 2
+        failureThreshold: 5
+        successThreshold: 1
+        httpGet:
+          path: /alive
+          port: {{ .Values.hello_data.port }}
+      readinessProbe:
+        initialDelaySeconds: 10
+        periodSeconds: 60
+        timeoutSeconds: 2
+        failureThreshold: 5
+        successThreshold: 1
+        httpGet:
+          path: /ready
+          port: {{ .Values.hello_data.port }}
